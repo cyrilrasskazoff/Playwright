@@ -1,0 +1,14 @@
+Установить Playwright с помощью менеджера пакетов pip
+pip install playwright
+
+Установите Pytest :
+pip install pytest
+
+Установите плагин Pytest :
+pip install pytest-playwright
+
+После установки пакета playwright  установите необходимые браузеры с помощью команды в терминале:
+playwright install chromium
+playwright install firefox
+!!! команда - playwright install - установит все браузеры сразу (включая WebKit для Safari), с работой посдеднго могут
+возникнуть проблемы, если версия MacOS не поддерживает посение обновления.

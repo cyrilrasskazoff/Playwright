@@ -1,0 +1,265 @@
+- Playwright поставляется со встроенными механизмами ожидания при взаимодействии со страницами.
+Проверка  элемента  включает:
+Attached - элемент присоединен к DOM. Элемент считается прикрепленным, если он подключен к DOM или ShadowRoot.
+Editable - элемент редактируемый. Элемент считается редактируемым, если он включен и у него не установлено свойство
+"read only".
+Enabled - элемент включен. Считается включенным, если у тегов button, select, input, textare не имеют свойства disabled.
+Receive Events - получает события, не заслоняемые другими элементами.
+Stable - элемент стабилен. Элемент считается стабильным, если он сохраняет ту же  область после двух или более
+последовательных кадров анимации.
+Visible -  элемент является видимым.
+
+Таблицу можно посмотреть тут: https://playwright.dev/python/docs/actionability
+
+*****************************
+Ввод текста и клик
+
+- locator.click(**kwargs)
+"""Данный метод принимает несколько аргументов, которые влияют на работу данного метода. Вот 3 наиболее часто
+используемых.
+click(button='right') - <"левая"|"правая"|"средняя"> По умолчанию
+сlick(force=True) - обходить проверки на возможность действия.
+click(modifiers=["Shift"]) - Клавиши-модификаторы, которые необходимо нажать. """
+
+- dblclick()
+"""Используется чтобы осуществить двойной клик по эдементу
+page.get_by_text("Копировать").dblclick()"""
+
+- locator.fill(текст, **kwargs)
+"""Передаваемые данные заполняются сразу единым блоком. Не важно сколько символов вы передали 5 или 100. В поле
+назначения все символы введутся сразу, одним действием  """
+
+- locator.type(текст, **kwargs)
+"""В отличие от  fill(), метод type() передает данные посимвольно. Фактически данный метод посылает события keydown,
+keypress/input и keyup для каждого символа в тексте."""
+
+- locator.press(key, **kwargs)
+"""Функциональные клавиши(F1 - F12, Backspace, Tab, Delete, Escape, ArrowDown, End, Enter, Home, Insert, PageDown,
+PageUp, ArrowRight, ArrowUp и так далее.) могут быть отправлены с помощью метода """
+
+**********************
+Checkbox, radio buttons, toggle
+
+locator.check(**kwargs) - Метод playwright созданный специально для работы с чекбоксами и радио кнопками.
+Этот метод проверяет элемент, выполняя следующие действия:
+    - Проверяет, что элемент является checkbox или radio input.
+    - Ждет проверки элемента на пригодность к действию, если не установлен параметр force.
+    - При необходимости осуществляет скролл к  элементу, чтобы он был видим.
+
+locator.click(**kwargs)
+Второй способ взаимодействия с данным типом веб-элементов - это уже знакомый нам клик
+
+********************
+Выпадающий список
+<select class="form-select" id="floatingSelect" aria-label="Floating label select example">
+    <option value="1">Нашел и завел bug</option>
+    <option value="2">Предложил новую функцию</option>
+    <option value="3">У меня лапки</option>
+  </select>
+
+Выпадающий список создается с помощью тега  <select>,  который представляет собой элемент управления интерфейса, в виде
+раскрывающегося списка. Каждый пункт выпадающего списка задается с помощью тега <option>
+
+locator.select_option(**kwargs) - Метод select_option() проверяет, что целевой элемент является тегом  <select>
+
+В качестве аргумента данного метода, передается один из трех атрибутов, который определяет стратегию поиска пункта в
+выпадающем списке:
+index - опции для выбора по индексу: индексы начинаются с ноля.
+value - для выбора по значению атрибута value.
+label - выбор по текстовому значению
+
+По умолчанию используется поиск по value. Вы можете использовать синтаксис, без явного указания стратегии поиска
+page.select_option('#floatingSelect', "3")
+
+***********************
+Drag and Drop
+Playwright  предоставляет возможность тестирования  drag & drop  одним лаконичным методом. Вы можете выполнить операцию
+перетаскивания с помощью  метода
+page.drag_and_drop(source, target, **kwargs)
+
+*********************
+Диалоговые окна
+Playwright может взаимодействовать с диалоговыми окнами веб-страницы
+- alert (оповещения),
+- confirm (получения подтверждения действия),
+- prompt (получения ввода от пользователей).
+
+! По умолчанию диалоговые окна  автоматически закрываются Playwright, поэтому вам необязательно их обрабатывать.
+
+Для вариатеивной работы с диалоговыми окнами, вы можете зарегистрировать обработчик перед действием, которое запускает
+диалоговое окно.  Playwright позволяет прослушивать различные типы событий, происходящих на веб-странице(такие как сетевые запросы,
+открытие страницы в новой вкладке, появление диалогового окна и т.д). Полный перечень событий доступен в документации:
+https://playwright.dev/python/docs/api/class-page#events
+page.on
+page.once - добавляет прослушиватель, который будет выполняться только один раз
+
+Для работы диалоговым окном в Playwright используется класс Dialog, https://playwright.dev/python/docs/api/class-dialog
+содержащий методы для работы с диалоговыми окнами.
+
+dialog.accept() - закрыть диалоговое окно нажав кнопку «OK»
+dialog.default_value - возвращает значение подсказки по умолчанию, в случае если тип диалога prompt
+dialog.dismiss() - закрыть диалоговое окно нажав кнопку «Отмена/Cancel»
+dialog.message - возвращает сообщение отображаемое в диалоговом окне.
+dialog.type - возвращает тип диалогового окна
+
+*********************
+Загрузка файла
+С Playwright можно тестировать загрузку файлов.
+Чтобы загрузить файлы хранящиеся локально на вашем ПК с помощью Playwright,  вы должны сначала найти элемент ввода для
+загрузки файла и использовать метод set_input_files(), чтобы указать путь к необходимому файлу.
+В метод set_input_files() передаем два аргумента:
+- selector - селектор для поиска элемента
+- files - путь к локальному файлу
+
+Но использование set_input_files() не единственный способ реализации сценария загрузки файла. Вы можете зарегистрировать
+ обработчик события "filechooser" и с помощью метода set_files() получить тот-же результат.
+
+
+******************
+Скачать файл
+Загрузка файлов генерирует событие "download" на странице, поэтому вы можете попросить playwright слушать это событие с
+помощью page.on("download") и обрабатывать его.   https://playwright.dev/python/docs/api/class-download#download
+
+Если вы понятия не имеете, что инициирует загрузку используйте следующую запись:
+page.on("download", lambda download: print(download.path()))
+
+Если вы знаете в результате чего происходит загрузка, в этом случае необходимо использовать метод expect_download() с
+менеджером контекста.
+with page.expect_download() as download_info:
+    page.locator("a:has-text(\"Download\")").click()
+
+Когда загрузка будет завершена, будет возвращена информация о загрузке и download_info примет результат загрузки. Вы
+можете получить значения  результата загрузки с помощью download_info.value. Сохраним информацию в переменную  download:
+download = download_info.value
+
+Методы:
+download.cancel() - отменяет загрузку
+download.delete() - удаляет загруженный файл
+download.failure() - возвращает ошибку загрузки, если таковая имеется.
+download.page - возвращает объект страницы, к которой принадлежит загрузка.
+download.path() - возвращает путь к загруженному файлу
+download.save_as(path) - скопирует загруженный файл по указанному пути
+download.suggested_filename - возвращает имя файла
+download.url - возвращает загруженный URL-адрес
+
+********************
+извлечь данные с веб-страниц
+К примеру  убедиться, что появилось сообщение для пользователя с определенным текстом.
+
+Вы можете получить текст веб-элемента двумя способами. Используя inner_text()
+element = page.locator('a:has-text("playwright")')
+print(element.inner_text())
+
+Или с помощью text_content()
+element = page.locator('a:has-text("playwright")')
+print(element.text_content())
+
+Используйте all_inner_text()  и all_text_contents() когда вам надо получить текст всех схожих элементов(например строк
+таблицы). В результате использования данных методов вернется массив значений для всех соответствующих элементов.
+
+В чем различия inner_text и text_content:
+- textContent получает содержимое всех элементов, включая <script> и <style>.
+- innerText умеет считывать стили и не возвращает содержимое скрытых элементов.
+
+Также кроме текста, можно получить HTML-код элемента.
+element = page.locator('a:has-text("playwright")')
+print(element.inner_html())
+
+*******************************
+Создание скриншотов
+- Вот быстрый способ сделать screenshot и сохранить его в файл:
+page.screenshot(path="screenshot.png")
+
+- Скриншот web-элемента
+page.locator(".header").screenshot(path="screenshot.png")
+
+Аргументы:
+
+- full_page (bool): Определяет, следует ли создать скриншот всей страницы (True) или только видимой области (False).
+По умолчанию значение False.
+page.screenshot(path="full_page.png", full_page=True)
+
+- type (str): Задает формат изображения. Доступные варианты включают 'jpeg' и 'png'. По умолчанию 'png'.
+page.screenshot(path="example.jpeg", type="jpeg")
+
+- quality (int): Качество сжатия изображения для формата 'jpeg'. Должно быть число от 0 до 100. По умолчанию не определено.
+page.screenshot(path="example.jpeg", type="jpeg", quality=80)
+
+- clip (dict): Задает область для создания скриншота, указав координаты x, y, ширину и высоту. Например:
+page.screenshot(path="clipped_image.png", clip={"x": 50, "y": 0, "width": 400, "height": 300})
+
+- omit_background (bool): Позволяет убрать фон изображения. Если True, фон на скриншоте будет прозрачным, что актуально
+в случае формата 'png'. По умолчанию значение False.
+page.screenshot(path="transparent_background.png", omit_background=True)
+
+- timeout (float | int): Задает максимальное время ожидания (в миллисекундах) перед созданием скриншота.
+Установите значение как "0", чтобы ждать неограниченное время. По умолчанию 30000 миллисекунд (30 секунд).
+page.screenshot(path="timeout_example.png", timeout=10000)
+
+*****************************
+Работа с несколькими вкладками(Tabs)
+Playwright открывает новые вкладки в контексте браузера. Каждый сеанс playwright начинается с иерархии
+браузер(Browser) -> контекст(Context) -> страница(Page).
+
+Используя следующий код, мы можем отслеживать открытие окна по определенному событию, например, при нажатии на элемент
+страницы. В нашем тестовом примере нажатие на элемент "Переход к Dashboard" открывает новую вкладку в контексте браузера.
+
+def test_new_tab(page):
+
+    page.goto("https://zimaev.github.io/tabs/")
+    with page.context.expect_page() as tab:
+        page.get_by_text("Переход к Dashboard").click()
+
+    new_tab = tab.value
+
+Метод page.context.expect_page()  ожидает открытия новой вкладки. Переменная tab - это класс EventInfo, возвращаемый
+менеджером контекста with. Мы можем получить доступ к классу с помощью свойства value.
+
+new_tab = tab.value
+
+*************************************
+*************************************
+Useful links
+- Чек-боксы и переключатели
+https://webdriveruniversity.com/Dropdown-Checkboxes-RadioButtons/index.html
+https://the-internet.herokuapp.com/checkboxes
+https://demoqa.com/checkbox
+https://demoqa.com/radio-button
+
+- Выпадающий список
+https://the-internet.herokuapp.com/dropdown
+
+- Кнопки
+https://demoqa.com/buttons
+https://letcode.in/buttons
+
+- Загрузка и скачивание
+https://demoqa.com/upload-download
+https://practice-automation.com/file-download/
+https://practice-automation.com/file-upload/
+
+- Всплывающие окна и алерты
+https://webdriveruniversity.com/Popup-Alerts/index.html
+https://demoqa.com/modal-dialogs
+https://practice-automation.com/popups/
+
+- Таблицы
+https://the-internet.herokuapp.com/tables
+https://demoqa.com/webtables
+http://uitestingplayground.com/dynamictable
+
+
+- Авторизация
+https://the-internet.herokuapp.com/login
+https://webdriveruniversity.com/Login-Portal/index.html
+
+- Заполнение форм
+https://webdriveruniversity.com/Contact-Us/contactus.html
+https://demoqa.com/automation-practice-form
+https://practice-automation.com/form-fields/
+https://letcode.in/edit
+https://www.globalsqa.com/samplepagetest/
+
+- Тестовые сайты
+https://www.saucedemo.com/
+https://demo.applitools.com/

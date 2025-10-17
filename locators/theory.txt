@@ -1,0 +1,229 @@
+Общий синтаксис селектора CSS выглядит так:
+tagname[attribute='attribute value']
+
+
+Общий синтаксис селектора XPath выглядит так:
+//tag_name[@attribute_name ='Value of attribute']
+
+
+Для того чтобы использовать селекторы  CSS и XPath в Рlaywright, реализован метод - page.locator(selector, **kwargs)
+Для того чтобы явно указать передаваемый тип локатора, вам необходимо указать префикс:
+css= - если вы используете css селектор:  page.locator("css=button").click()
+xpath= -  в случае если вы передали xpath селектор:  page.locator("xpath=//button").click()
+
+! Но даже если вы не будете указывать префикс,  Рlaywright автоматически определит тип локатора.
+Селектор, начинающийся с // или ..будет восприниматься как селектором xpath.
+
+
+Селекторы по ID
+CSS: page.locator("#new-todo").click()
+XPath: page.locator("//*[@id='new-todo']").click()
+
+
+Селекторы по CLASS
+CSS: page.locator(".new-todo").click()
+XPath: page.locator("//*[@class='new-todo']").click()
+
+
+объединение нескольких классов для поиска элемента:
+CSS: page.locator("css=.first-class.another-class").click()
+XPath: page.locator("xpath=//div[contains(@class, 'first-class') and contains(@class, 'another-class')]").click()
+
+
+Селекторы по атрибуту
+CSS: page.locator("[placeholder='Your email address']").click()
+XPath: page.locator("//*[@placeholder='Your email address']").click()
+
+
+!!!Комбинация селекторов:
+Комбинация селекторов тега, класса или ID и атрибута может оказаться лучшей стратегией, чем использование только одного
+из данных типов селектора.
+CSS: page.locator("input[placeholder='Your email address']").click()
+XPath: page.locator("//input[@placeholder='Your email address']").click()
+
+
+Комбинатор потомков:
+символ пробела между селекторами выберет все вложенные элементы независимо от уровня вложенности.
+">" между селекторами - выберет только элементы вложенные на один уровень (детей)
+
+CSS: page.locator(".container p").click()
+XPath: page.locator("*[@class = 'cantainer']//p").click()
+
+CSS: page.locator(".container > p").click()
+XPath: page.locator("*[@class = 'cantainer']/p").click()
+
+
+*****************************
+Псевдоклассы CSS в Рlaywright !!! использовать крайне редко - flaky
+примеры ниже приведены на основе сайта  https://zimaev.github.io/table-1/
+чтобы открыть playwright inspector сайта в консоли ввести:  playwright open <url>
+
+- :right-of(div > button) - Соответствует элементам, которые находятся справа от любого элемента, соответствующего
+внутреннему селектору, в любом положении по вертикали
+page.locator("td:right-of(td p:text('Software engineer'))")
+
+- :left-of(div > button) - Соответствует элементам, которые находятся слева от любого элемента, соответствующего
+внутреннему селектору, в любом положении по вертикали
+page.locator("td:left-of(td p:text('Software engineer'))")
+
+- :above(div > button) - Соответствует элементам, которые находятся над любым из элементов, соответствующих внутреннему
+селектору, в любом горизонтальном положении.
+page.locator("td:above(td p:text('Consultant'))")
+
+- :below(div > button) - Соответствует элементам, которые находятся под любым из элементов, соответствующих внутреннему
+селектору, в любом горизонтальном положении.
+page.locator("td:below(td p:text('Consultant'))")
+
+- :near(div > button) - Подбирает элементы, которые находятся рядом (в пределах 50 CSS пикселей) с любым из элементов,
+соответствующих внутреннему селектору.
+page.locator("td:near(td p:text('Consultant'))")
+
+- :visible  - псевдокласс в CSS-селекторах для выбора видимого элемента
+page.locator("button:visible").click()
+
+- :has-text() - псевдокласс  выбора элемента содержащего указанный текст
+page.locator('div:has-text("Card")').click()
+!!! псевдокласс :has-text() нужно обязательно использовать вместе с  css селектором, иначе Playwright будет искать
+указанный текст по всему DOM. И с большой долей вероятности, будет найден не тот элемент, который вы ожидаете.
+
+
+- Все псевдоклассы макета поддерживают необязательную опцию - максимальное расстояние в пикселях. Например,
+button:near(:text("Username"), 120) соответствует кнопке, которая находится на расстоянии не более 120 пикселей от
+элемента с текстом "Username".
+page.locator("td:below(td p:text('Software engineer'), 100)")
+
+
+- Элементы, отвечающие одному из условий:
+page.locator('button:has-text("Log in"), button:has-text("Sign in")').click() - нажимает на элемент с тегом <button>,
+которая содержит текст "Log in" или "Sign in".
+
+
+- Локатор N-го элемента:
+# Первый элемент
+page.locator("button").locator("nth=0").click()
+page.locator("button").first().click()
+# Последний элемент
+page.locator("button").locator("nth=-1").click()
+page.locator("button").last().click()
+
+
+************************
+Встроенные локаторы get_by_*
+начиная с версии Playwright 1.27, реализованы несколько встроенных локаторов, которые упрощают и организуют процесс
+локализации веб-элемента.  Для обеспечения стабильности своих тестов, создатели Playwright рекомендуют использовать
+именно локаторы get_by_*.
+
+- Поиск по тексту - page.get_by_text(text, **kwargs)
+По умолчанию данный метод ищет вхождение текста, а не точное его совпадение.
+page.get_by_text("switch checkbox").click()
+Но если вы передадите параметр exact=True, то Playwright будет искать точное совпадение.
+page.get_by_text("switch checkbox",exact=True).click()
+
+- Поиск по тегу <label> - page.get_by_label(text, **kwargs)
+Тег <label> добавляет подпись к веб-элементу и используется как правило для тегов <button>, <input>,
+<select> и <textarea>.
+page.get_by_label("Email address").fill("qa@example.com")
+
+- Поиск по плейсхолдеру - page.get_by_placeholder(text, **kwargs)
+page.get_by_placeholder("password")
+
+- Поиск на основе data-testid - page.get_by_test_id(test_id)
+Атрибут <data-testid> используется для идентификации веб-элемента специально для облегчения процесса тестирования.
+Как правило, данный атрибут применяется в том случае, если значения атрибутов тегов генерируются случайно при
+развертывании приложения.
+page.get_by_test_id('todo-title').click()
+
+- Поиск изображение на основе атрибута alt - page.get_by_alt_text(text, **kwargs)
+Атрибут alt добавляет текст для изображений.
+page.get_by_alt_text('logo').click()
+
+- Поиск по его атрибуту title - page.get_by_title(text, **kwargs)
+Атрибут <title> используется для указания дополнительной информации об элементе. Когда указатель мыши перемещается по
+веб-элементу, отображается информация указанная в атрибуте <title>
+page.get_by_title("username").fill("Anton")
+
+- Поиск элемента по роли ARIA - page.get_by_role(role, **kwargs)
+Поиск по роли ARIA(атрибутам доступности) - это новый подход к стратегии составления локаторов и поиска веб-элементов.
+Локатор page.get_by_role(role, ** kwargs) отражает то, как вспомогательные технологии(Скринридер (screen reader)) для
+людей с ограниченными возможностями, воспринимают страницу. Например, является ли какой-либо элемент кнопкой(button) или
+заголовком(теги h1-h6).
+Роли ARIA придают содержимому смысловое и семантическое значение. Роли ARIA добавляются в элементы HTML с помощью явного
+атрибута role="role type", где role type - это имя роли в спецификации ARIA.
+Все поддериваемые роли можно найти по ссылке https://www.w3.org/TR/wai-aria-1.2/#role_definitions
+Но даже если атрибут role не указывается у веб-элемента, то все элементы имеют «неявную ARIA-семантику по умолчанию»
+https://www.w3.org/TR/wai-aria-1.1/#implicit_semantics
+При поиске по роли ARIA обычно следует также передавать доступное имя, чтобы локатор точно определил нужный элемент.
+page.get_by_role("button", name="Submit").click()
+
+************************
+- Локатор locator.or_
+Создает локатор, который соответствует любому из двух локаторов.
+Локатор locator.or_ используется для поиска элемента, который соответствует хотя бы одному из заданных селекторов.
+Например:
+def test_or(page):
+    selector = page.locator("input").or_(page.locator("text"))
+    selector.fill("Hello Stepik")
+
+- Локатор locator.and_
+Локатор locator.and_ используется для поиска элемента, который соответствует всем заданным селекторам.
+Например:
+def test_locator_and(page):
+    page.goto("https://zimaev.github.io/locatorand/")
+    selector = page.get_by_role("button", name="Sing up").and_(page.get_by_title("Sing up today"))
+    selector.click()
+
+***********************
+- Цепочка локаторов.
+Довольно распространенной проблемой является, когда вы не можете найти подходящий уникальный локатор для интересующего
+вас элемента, но  можете найти локатор для элемента в который входит нужный вам веб-элемент.
+Локаторы могут быть объединены в последовательность(цепь)  с помощью символа  ">>"
+page.locator("#navbarNavDropdown >> li:has-text('Company')").click()
+
+Другим вариантом использования цепочки локаторов является сохранение веб-элемента в переменную и обращение к локаторам с
+ помощью этой переменной.
+nav_bar = page.locator('div#navbarNavDropdown')
+nav_bar.locator("li:has-text('Company')").click()
+
+
+- Фильтрация
+Для того чтобы помочь локализовать поиск,  реализован метод filter(). Сузить поиск можно передав аргументом фильтр по
+тексту, по локатору или можно использовать оба способа фильтрации.
+Функция filter()  принимает несколько аргументов: has, has_not, has_text, has_not_text.
+- фильтр по тексту (has_text=):
+page.locator("li").filter(has_text='Company').click()
+- фильтр по тексту, которого не содерит искомый элемент (has_not_text=)Ж
+page.locator("li").filter(has_not_text='Company').click()
+Поиск совпадений не чувствителен к регистру и ищет подстроку
+
+- фильтр по локатору (has=):
+page.locator('li').filter(has=page.locator('.dropdown-toggle')).click()
+- поиск элементов, не соответствующих определенному локатору (has_not=):
+total = page.locator("tr").filter(has_not=page.get_by_role("button")).count()
+print(total)
+
+- И все это можно комбинировать:
+row_locator = page.locator("tr")
+row_locator
+    .filter(has_text="text in column 1")
+    .filter(has=page.get_by_role("button", name="column 2 button"))
+    .click()
+
+********************
+Работа с несколькими элементами
+Если у вас есть список одинаковых элементов, и единственным способом различить их является порядок, вы можете выбрать
+конкретный элемент из списка с помощью locator.count(), locator.first, locator.last или locator.nth(index)
+
+Работа с несколькими элементами (версия playwright  >= 1.29)
+Cпециализированный метод locator.all() для перебора всех совпадающих элементов. Если локатор находит несколько
+элементов, метод locator.all() возвращает массив локаторов указывающих на соответствующие элементы.
+
+checkboxes = page.locator("input")
+for checkbox in checkboxes.all():
+    checkbox.check()
+
+
+
+
+
+
+

@@ -1,0 +1,46 @@
+Web-first assertions - фишка PlayWright - список проверок и система повтора действий вплоть до получения желаемого результата.
+Проверки автоматически будут ждать и повторять проверку до тех пор, пока не будет выполнено ожидаемое условие.
+
+За основу проверок в Playwright взята JS библиотека Expect. https://jestjs.io/docs/next/expect
+
+Синтаксис: функция expect(<locator>/<web_page>/<api_response>).условие проверки
+Проверка	                              Описание
+expect(locator).to_be_checked()	    Checkbox  установлен
+expect(locator).to_be_disabled()	Веб-элемент отключен
+expect(locator).to_be_editable()	Веб-элемент возможно редактировать
+expect(locator).to_be_empty()	    Веб-элемент пустой
+expect(locator).to_be_enabled()	    Веб-элемент включен/активен
+expect(locator).to_be_focused()	    Веб-элемент находится в фокусе
+expect(locator).to_be_hidden()	    Веб-элемент не отображается
+expect(locator).to_be_visible()	    Веб-элемент видим/отображается
+expect(locator).to_contain_text()	Веб-элемент содержит текст(текст передается аргументом к проверке)
+expect(locator).to_have_attribute()	Веб-элемент имеет атрибут(атрибут передается аргументом к проверке)
+expect(locator).to_have_class()	    Элемент имеет класс (класс передается аргументом к проверке)
+expect(locator).to_have_count()	    Список имеет указанное количество/длину
+expect(locator).to_have_css()	    Элемент имеет CSS свойство (свойство передается аргументом к проверке)
+expect(locator).to_have_id()	    Элемент имеет идентификатор (идентификатор передается аргументом к проверке)
+expect(locator).to_have_js_property() Элемент имеет JavaScript свойство (свойство передается аргументом к проверке)
+expect(locator).to_have_text()	    Элемент имеет текст (проверяемый текст передается аргументом к проверке)
+expect(locator).to_have_value()	    Input имеет значение (проверяемое значение передается аргументом к проверке)
+expect(locator).to_have_values()	Select имеет опции для выбора (опция передается аргументом к проверке)
+expect(page).to_have_title()	    Страница имеет  title (текст  title передается аргументом к проверке)
+expect(page).to_have_url()	        Страница имеет URL (URL передается аргументом к проверке)
+expect(api_response).to_be_ok()	    Ответ имеет статус OK
+
+**************************
+В свою очередь условие проверки может иметь два варианта записи:
+
+Вариант 1 - Использовать проверку без передачи в нее аргументов.
+expect(locator).not_to_be_checked()
+
+Вариант 2 - Если указаны ожидаемые значения expected, name, value и т.д, то необходимо их передать для проверки. Данные
+атрибуты определяют какие выражения, значения атрибутов мы будет сравнивать с фактическим результатом.
+expect(locator).not_to_contain_text(expected, **kwargs)
+expect(locator).not_to_have_attribute(name, value, **kwargs)
+
+*****************************
+Пользовательское сообщение об ошибке
+Вы можете указать свое сообщение об ошибке в качестве второго аргумента функции expect, например:
+
+expect(page.get_by_text("Name"), "Сообщение не отображается на странице").to_contain_text("Open Solutions")
+
