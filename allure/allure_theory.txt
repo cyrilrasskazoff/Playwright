@@ -85,3 +85,28 @@ def test_annotated():
     with allure.step("Шаг 1"):
         assert True
 
+
+************************
+************************
+чтобы отчет allure был доступен на github, мы будем использовать GitHub Pages. Приступим к настройкам репозитория:
+На странице репозитория на GitHub перейдите в Settings → Actions → General.
+В разделе Workflow permissions выберите параметр Workflow permissions -> Read and write permissions -> Save
+
+Настройка публикации  отчета на GitHub Pages:
+После выполнения тестов,  GitHub Action будет отправлять отчет Allure в специально созданную ветку из которой будет он
+будет публиковаться с помощью сервиса GitHub Pages.
+
+Давайте создадим ветку в которой будет храниться отчет:
+Откройте репозиторий на GitHub -> Слева нажмите Branch -> New branch -> имя ветки = gh-pages -> Create new branch
+
+Далее необходимо указать в настройках репозитория, какая ветка будет использоваться для GitHub Pages:
+На странице репозитория на GitHub перейдите в Settings → Pages -> Build and deployment -> Source: “Deploy from a branch” ->
+-> Branch:  gh-pages -> Save
+
+Далее нужно обновить файл .github/workflows/playwright.yml
+
+Публикация отчета после отправки изменений на GitHub может занять до 10 минут. Чтобы просмотреть опубликованный отчет
+откройте настройки Settings → Pages. , в разделе GitHub Pages нажмите Visit site
+
+
+
