@@ -31,7 +31,7 @@ jobs:
     # - Запуск тестов (если в вашем файле pytest.ini не указана директория для сохранения отчёта Allure/ нет файла
     # pytest.ini, добавьте к команде запуска тестов флаг --alluredir=reports)
       - name: Run your tests
-        run: pytest -s -v
+        run: pytest -s -v pom_project/conftest.py
     # - Загрузка артефактов
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
