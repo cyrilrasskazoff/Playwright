@@ -10,7 +10,9 @@ import pytest
 @pytest.fixture()
 def browser_fixture():
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=False)
+        # browser = playwright.chromium.launch(headless=False) commented to avoid fails in github actions, caused by
+        # headed mode
+        browser = playwright.chromium.launch()
         context = browser.new_context()
         page = context.new_page()
         yield page
