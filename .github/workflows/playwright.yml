@@ -1,27 +1,38 @@
 name: Playwright Tests
+# Определение события, запускающего workflow
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+# Определение Задачи(job)
 jobs:
-  test:
+  test:  # test — это имя работы (job).
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # работа будет выполняться на виртуальной машине с последней версией Ubuntu
+    # Шаги выполнения работы:
+    # - Клонирование репозитория
     steps:
       - uses: actions/checkout@v4
+    # - Установка Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
+    # - Установка зависимостей (Обновляет pip до последней версии, Устанавливает зависимости, указанные в файле
+    # pom_project/requirements.txt)
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r pom_project/requirements.txt
+    # - Установка браузеров установка браузеров, а также необходимых зависимостей
       - name: Ensure browsers are installed
         run: python -m playwright install --with-deps
+    # - Запуск тестов (если в вашем файле pytest.ini не указана директория для сохранения отчёта Allure/ нет файла
+    # pytest.ini, добавьте к команде запуска тестов флаг --alluredir=reports)
       - name: Run your tests
         run: pytest -s -v
+    # - Загрузка артефактов
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
