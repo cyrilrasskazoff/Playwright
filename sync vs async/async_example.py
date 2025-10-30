@@ -1,6 +1,7 @@
 from playwright.async_api import async_playwright
 import asyncio
 
+
 async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False, slow_mo=2000)
